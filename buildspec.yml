@@ -7,16 +7,20 @@ phases:
     commands:
       - echo $TEST_VARIABLE
       - echo Building from source
-      - mvn clean install
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region ap-south-1 --no-include-email)
       - REPOSITORY_URI=673274864623.dkr.ecr.ap-south-1.amazonaws.com/aws-ci-cd-learning
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
+      - echo $REPOSITORY_URI
+      - echo $COMMIT_HASH
+      - echo $IMAGE_TAG
   build:
     commands:
       - echo Build started on `date`
+      - echo Building source...
+      - mvn clean install
       - echo Building the Docker image...
       - docker build -t $REPOSITORY_URI:latest .
       - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
